@@ -83,6 +83,12 @@ const ProductDetail = () => {
     /*************************** Product Detail and Category ********************/
     const {productId} = useParams()
     const urlParams = new URLSearchParams(location.search)
+    
+    // Set Cache-Tag header with productId
+    if (res && productId) {
+        res.set('Cache-Tag', productId)
+    }
+
     const {
         data: product,
         isLoading: isProductLoading,

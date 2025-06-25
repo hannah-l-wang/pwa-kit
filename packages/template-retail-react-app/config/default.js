@@ -32,19 +32,19 @@ module.exports = {
                 landingPath: '/reset-password-landing'
             }
         },
-        defaultSite: 'RefArchGlobal',
+        defaultSite: 'SiteGenesisGlobal',
         siteAliases: {
-            RefArch: 'us',
-            RefArchGlobal: 'global'
+            SiteGenesis: 'us',
+            SiteGenesislobal: 'global'
         },
         sites,
         commerceAPI: {
             proxyPath: `/mobify/proxy/api`,
             parameters: {
-                clientId: 'c9c45bfd-0ed3-4aa2-9971-40f88962b836',
-                organizationId: 'f_ecom_zzrf_001',
+                clientId: '92772775-97b5-42b3-a3a7-cf63c579aed6',
+                organizationId: 'f_ecom_bldp_prd',
                 shortCode: '8o7m175y',
-                siteId: 'RefArchGlobal'
+                siteId: 'SiteGenesisGlobal'
             }
         },
         einsteinAPI: {
@@ -74,11 +74,11 @@ module.exports = {
         ssrFunctionNodeVersion: '22.x',
         proxyConfigs: [
             {
-                host: 'kv7kzm78.api.commercecloud.salesforce.com',
+                host: 'sandbox-001.api.commercecloud.salesforce.com',
                 path: 'api'
             },
             {
-                host: 'zzrf-001.dx.commercecloud.salesforce.com',
+                host: 'production-realm05-qa223.demandware.net',
                 path: 'ocapi'
             }
         ]
