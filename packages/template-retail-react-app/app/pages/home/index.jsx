@@ -36,6 +36,8 @@ import {heroFeatures, features} from '@salesforce/retail-react-app/app/pages/hom
 //Hooks
 import useEinstein from '@salesforce/retail-react-app/app/hooks/use-einstein'
 import useDataCloud from '@salesforce/retail-react-app/app/hooks/use-datacloud'
+import useMultiSite from '@salesforce/retail-react-app/app/hooks/use-multi-site'
+import {useCurrency} from '@salesforce/retail-react-app/app/hooks/use-currency'
 
 // Constants
 import {
@@ -45,7 +47,8 @@ import {
     STALE_WHILE_REVALIDATE
 } from '@salesforce/retail-react-app/app/constants'
 import {useServerContext} from '@salesforce/pwa-kit-react-sdk/ssr/universal/hooks'
-import {useProductSearch} from '@salesforce/commerce-sdk-react'
+import {useProductSearch, useCustomerId} from '@salesforce/commerce-sdk-react'
+import {buildHomepageCacheTags} from '@salesforce/retail-react-app/app/utils/cache-tags'
 
 /**
  * This is the home page for Retail React App.
@@ -58,6 +61,9 @@ const Home = () => {
     const einstein = useEinstein()
     const dataCloud = useDataCloud()
     const {pathname} = useLocation()
+    const {site} = useMultiSite()
+    const {currency} = useCurrency()
+    const customerId = useCustomerId()
 
     const {res} = useServerContext()
     if (res) {
@@ -77,6 +83,21 @@ const Home = () => {
             refine: [`cgid=${HOME_SHOP_PRODUCTS_CATEGORY_ID}`, 'htype=master']
         }
     })
+
+    // Set cache tags for homepage
+    if (res) {
+        const context = {
+            locale: useIntl().locale,
+            currency: currency,
+            siteId: site.id,
+            customerId: customerId
+        }
+
+        const cacheTags = buildHomepageCacheTags(context)
+        const cacheTagString = cacheTags.join(',')
+
+        res.set('Cache-Tag', cacheTagString)
+    }
 
     /**************** Einstein ****************/
     useEffect(() => {

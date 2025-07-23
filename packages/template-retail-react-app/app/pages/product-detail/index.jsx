@@ -34,6 +34,10 @@ import useEinstein from '@salesforce/retail-react-app/app/hooks/use-einstein'
 import useDataCloud from '@salesforce/retail-react-app/app/hooks/use-datacloud'
 import useActiveData from '@salesforce/retail-react-app/app/hooks/use-active-data'
 import {useServerContext} from '@salesforce/pwa-kit-react-sdk/ssr/universal/hooks'
+import {useProductSearch} from '@salesforce/commerce-sdk-react'
+import {buildProductCacheTags} from '@salesforce/retail-react-app/app/utils/cache-tags'
+import useMultiSite from '@salesforce/retail-react-app/app/hooks/use-multi-site'
+import {useCurrency} from '@salesforce/retail-react-app/app/hooks/use-currency'
 // Project Components
 import RecommendedProducts from '@salesforce/retail-react-app/app/components/recommended-products'
 import ProductView from '@salesforce/retail-react-app/app/components/product-view'
@@ -67,6 +71,8 @@ const ProductDetail = () => {
     const toast = useToast()
     const navigate = useNavigation()
     const customerId = useCustomerId()
+    const {site} = useMultiSite()
+    const {currency} = useCurrency()
 
     /****************************** Basket *********************************/
     const {isLoading: isBasketLoading} = useCurrentBasket()
@@ -84,11 +90,6 @@ const ProductDetail = () => {
     const {productId} = useParams()
     const urlParams = new URLSearchParams(location.search)
     
-    // Set Cache-Tag header with productId
-    if (res && productId) {
-        res.set('Cache-Tag', productId)
-    }
-
     const {
         data: product,
         isLoading: isProductLoading,
@@ -132,6 +133,23 @@ const ProductDetail = () => {
             levels: 1
         }
     })
+
+    // Set comprehensive cache tags with multiple levels of specificity
+    if (res && product) {
+        // Build context for cache tags
+        const context = {
+            locale: useIntl().locale,
+            currency: currency,
+            siteId: site.id,
+            customerId: customerId
+        }
+        
+        // Build cache tags using the utility function (includes category logic)
+        const cacheTags = buildProductCacheTags(product, context, category)
+        const cacheTagString = cacheTags.join(',')
+        
+        res.set('Cache-Tag', cacheTagString)
+    }
 
     /****************************** Sets and Bundles *********************************/
     const [childProductSelection, setChildProductSelection] = useState({})

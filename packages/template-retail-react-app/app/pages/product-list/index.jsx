@@ -74,6 +74,8 @@ import {useToast} from '@salesforce/retail-react-app/app/hooks/use-toast'
 import useEinstein from '@salesforce/retail-react-app/app/hooks/use-einstein'
 import useDataCloud from '@salesforce/retail-react-app/app/hooks/use-datacloud'
 import useActiveData from '@salesforce/retail-react-app/app/hooks/use-active-data'
+import useMultiSite from '@salesforce/retail-react-app/app/hooks/use-multi-site'
+import {useCurrency} from '@salesforce/retail-react-app/app/hooks/use-currency'
 
 // Others
 import {HTTPNotFound, HTTPError} from '@salesforce/pwa-kit-react-sdk/ssr/universal/errors'
@@ -95,6 +97,7 @@ import useNavigation from '@salesforce/retail-react-app/app/hooks/use-navigation
 import LoadingSpinner from '@salesforce/retail-react-app/app/components/loading-spinner'
 import {useWishList} from '@salesforce/retail-react-app/app/hooks/use-wish-list'
 import {isHydrated} from '@salesforce/retail-react-app/app/utils/utils'
+import {buildCategoryCacheTags} from '@salesforce/retail-react-app/app/utils/cache-tags'
 
 // NOTE: You can ignore certain refinements on a template level by updating the below
 // list of ignored refinements.
@@ -123,6 +126,8 @@ const ProductList = (props) => {
     const {res} = useServerContext()
     const customerId = useCustomerId()
     const [searchParams, {stringify: stringifySearchParams}] = useSearchParams()
+    const {site} = useMultiSite()
+    const {currency} = useCurrency()
 
     /**************** Page State ****************/
     const [filtersLoading, setFiltersLoading] = useState(false)
@@ -187,6 +192,21 @@ const ProductList = (props) => {
             enabled: !isSearch && !!params.categoryId
         }
     )
+
+    // Set cache tags for category/product list pages
+    if (res && category) {
+        const context = {
+            locale: useIntl().locale,
+            currency: currency,
+            siteId: site.id,
+            customerId: customerId
+        }
+
+        const cacheTags = buildCategoryCacheTags(category, context)
+        const cacheTagString = cacheTags.join(',')
+
+        res.set('Cache-Tag', cacheTagString)
+    }
 
     // Apply disallow list to refinements.
     if (productSearchResult?.refinements) {
