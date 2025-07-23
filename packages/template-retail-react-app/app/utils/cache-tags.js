@@ -10,6 +10,14 @@
  */
 
 /**
+ * Adds the global cache tag for bulk invalidation
+ * @param {Array} tags - Array to add tags to
+ */
+const addGlobalTag = (tags) => {
+    tags.push('pwa-global')
+}
+
+/**
  * Adds context-based cache tags (locale, currency, site, user)
  * @param {Array} tags - Array to add tags to
  * @param {Object} context - Context object with locale, currency, siteId, customerId
@@ -124,6 +132,9 @@ const getAvailabilityStatus = (inventory) => {
 export const buildProductCacheTags = (product, context = {}, category = null) => {
     const tags = []
 
+    // Global tag for bulk invalidation
+    addGlobalTag(tags)
+
     // Product-specific tags
     addProductTags(tags, product)
 
@@ -148,6 +159,9 @@ export const buildProductCacheTags = (product, context = {}, category = null) =>
 export const buildCategoryCacheTags = (category, context = {}) => {
     const tags = []
 
+    // Global tag for bulk invalidation
+    addGlobalTag(tags)
+
     // Category tags
     addCategoryTags(tags, category)
 
@@ -167,6 +181,9 @@ export const buildCategoryCacheTags = (category, context = {}) => {
  */
 export const buildHomepageCacheTags = (context = {}) => {
     const tags = []
+
+    // Global tag for bulk invalidation
+    addGlobalTag(tags)
 
     // Context tags
     addContextTags(tags, context)
@@ -196,9 +213,7 @@ export const buildCacheTags = (pageType, data = {}, context = {}) => {
         case 'home':
             return buildHomepageCacheTags(context)
         default:
-            // Generic tags for unknown page types
-            addContextTags(tags, context)
-            tags.push(`page-${pageType}`)
+            // No cache tags for unknown page types
             return tags
     }
 } 
