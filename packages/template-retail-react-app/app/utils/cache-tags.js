@@ -45,6 +45,11 @@ const addProductTags = (tags, product) => {
         tags.push(`product-${product.id}`)
     }
 
+    // Add master product ID if this is a variant and it's different from the product ID
+    if (product?.master?.masterId && product.master.masterId !== product.id) {
+        tags.push(`product-${product.master.masterId}`)
+    }
+
     if (product?.brand) {
         tags.push(`brand-${product.brand}`)
     }
